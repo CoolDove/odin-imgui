@@ -3,7 +3,7 @@ package imgui_impl_sdl;
 import "core:runtime";
 import "core:fmt";
 
-import sdl "shared:odin-sdl2";
+import sdl "vendor:sdl2";
 
 import imgui "../..";
 
