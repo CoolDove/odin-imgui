@@ -4,6 +4,8 @@ OC  = odin
 CC = cl
 LINK = lib
 
+TOOLS_DIR = D:\softw\msys2\usr\bin\
+
 PROGRAM_NAME = odin-imgui-gen
 
 FLAGS = --out=$(EXE_NAME)
@@ -16,7 +18,7 @@ PDB_NAME = $(PROGRAM_NAME).pdb
 EXAMPLES_DIR = ./examples
 DIST_DIR = ./dist
 ODIN_OUTPUT_DIR = ./output
-EXTERNAL_LIB_DIR = ./output/external
+EXTERNAL_LIB_DIR = ./external
 
 CIMGUI_SRC= ./cimgui/cimgui.cpp ./cimgui/imgui/imgui.cpp ./cimgui/imgui/imgui_draw.cpp ./cimgui/imgui/imgui_demo.cpp ./cimgui/imgui/imgui_widgets.cpp ./cimgui/imgui/imgui_tables.cpp
 CIMGUI_OBJS=cimgui.obj imgui.obj imgui_draw.obj imgui_demo.obj imgui_widgets.obj imgui_tables.obj
@@ -58,21 +60,26 @@ update: clean all generate
 
 clean:
 	@echo "[Clean]"
-	rm -rf $(ODIN_OUTPUT_DIR)
-	rm -rf *.exe
-	rm -rf *.pdb
-	rm -rf *.obj
-	rm -rf $(EXTERNAL_LIB_DIR)
-	rm -rf $(DIST_DIR)
+	$(TOOLS_DIR)rm -rf $(ODIN_OUTPUT_DIR)
+	$(TOOLS_DIR)rm -rf *.exe
+	$(TOOLS_DIR)rm -rf *.pdb
+	$(TOOLS_DIR)rm -rf *.obj
+	$(TOOLS_DIR)rm -rf $(EXTERNAL_LIB_DIR)
+	$(TOOLS_DIR)rm -rf $(DIST_DIR)
 
-build_cimgui:
+cimgui_lib:
 	@echo "[Build CIMGUI]"
-	@mkdir -p $(EXTERNAL_LIB_DIR)
+	@echo "%ENVAR%"
+	$(TOOLS_DIR)\mkdir -p "$(EXTERNAL_LIB_DIR)"
 
 	$(CC) $(CIMGUI_FLAGS) /MTd /Zi /Fd:$(EXTERNAL_LIB_DIR)/cimgui_debug.pdb $(CIMGUI_SRC)
 	$(LINK) /nologo $(CIMGUI_OBJS) /out:$(EXTERNAL_LIB_DIR)/cimgui_debug.lib
-	rm *.obj
+	$(TOOLS_DIR)\rm *.obj
 	
 	$(CC) $(CIMGUI_FLAGS) /MT /O2 $(CIMGUI_SRC)
 	$(LINK) /nologo $(CIMGUI_OBJS) /out:$(EXTERNAL_LIB_DIR)/cimgui.lib
-	rm *.obj
+	$(TOOLS_DIR)\rm *.obj
+
+cimgui_clean:
+	@echo "[ CIMGUI CLEAN ]"
+	$(TOOLS_DIR)\rm -r -f $(EXTERNAL_LIB_DIR)
