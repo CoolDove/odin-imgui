@@ -65,7 +65,7 @@ clean:
 	rm -rf $(EXTERNAL_LIB_DIR)
 	rm -rf $(DIST_DIR)
 
-cimgui:
+build_cimgui:
 	@echo "[Build CIMGUI]"
 	@mkdir -p $(EXTERNAL_LIB_DIR)
 

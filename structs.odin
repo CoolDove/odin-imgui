@@ -409,6 +409,13 @@ Viewport :: struct {
 	size:      Vec2,
 	work_pos:  Vec2,
 	work_size: Vec2,
+	
+	dpi_scale: f32,
+
+	draw_data: ^Draw_Data,
+	parent_viewport_id: u32,
+
+	renderer_user_data, platform_user_data, platform_handle, platform_handle_raw : rawptr,
 }
 
 //ImVec2 

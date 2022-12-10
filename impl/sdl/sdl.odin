@@ -2,15 +2,70 @@ package imgui_impl_sdl;
 
 import "core:runtime";
 import "core:fmt";
+import "core:log";
 
 import sdl "vendor:sdl2";
 
 import imgui "../..";
 
 SDL_State :: struct {
+    window : ^sdl.Window,
     time: u64,
     mouse_down: [3]bool,
     cursor_handles: [imgui.Mouse_Cursor.Count]^sdl.Cursor,
+}
+
+
+PlatformData :: struct {
+    window : ^sdl.Window,
+    renderer : ^sdl.Renderer,
+}
+
+init :: proc(state: ^SDL_State, window: ^sdl.Window)  {
+    io := imgui.get_io()
+    assert(io.backend_platform_user_data == nil, "Already initialized a platform backend for imgui!")
+
+    io.backend_flags |= .HasGamepad 
+    io.backend_flags |= .HasMouseCursors 
+    io.backend_flags |= .HasSetMousePos
+
+    io.backend_platform_name = "SDL2"
+    io.backend_platform_user_data = state
+
+    imgui_viewport := imgui.get_main_viewport()
+    imgui_viewport.platform_handle = window
+    sdl.GetWindowWMInfo(window, &raw_info)
+    imgui_viewport.platform_handle_raw = &raw_info
+
+    setup_state(state)
+    state.window = window
+
+    io.backend_platform_user_data = state
+}
+
+raw_info : sdl.SysWMinfo
+
+new_frame :: proc() {
+    io := imgui.get_io()
+    state := cast(^SDL_State)io.backend_platform_user_data
+    using state
+    // update display size
+    w, h, display_h, display_w: i32;
+    sdl.GetWindowSize(window, &w, &h);
+    if sdl.GetWindowFlags(window) & u32(sdl.WindowFlag.MINIMIZED) != 0 {
+        w = 0;
+        h = 0;
+    }
+    sdl.GL_GetDrawableSize(window, &display_w, &display_h);
+
+    io.display_size = imgui.Vec2{f32(display_w), f32(display_h)};
+
+    if w > 0 && h > 0 {
+        io.display_framebuffer_scale = imgui.Vec2{f32(display_w / w), f32(display_h / h)};
+    }
+    //
+    update_mouse(state, window)
+    update_dt(state)
 }
 
 setup_state :: proc(using state: ^SDL_State) {
@@ -129,22 +184,6 @@ update_mouse :: proc(state: ^SDL_State, window: ^sdl.Window) {
             sdl.SetCursor(chosen_cursor);
             sdl.ShowCursor(sdl.ENABLE);
         }
-    }
-}
-
-update_display_size :: proc(window: ^sdl.Window) {
-    w, h, display_h, display_w: i32;
-    sdl.GetWindowSize(window, &w, &h);
-    if sdl.GetWindowFlags(window) & u32(sdl.WindowFlag.MINIMIZED) != 0 {
-        w = 0;
-        h = 0;
-    }
-    sdl.GL_GetDrawableSize(window, &display_w, &display_h);
-
-    io := imgui.get_io();
-    io.display_size = imgui.Vec2{f32(w), f32(h)};
-    if w > 0 && h > 0 {
-        io.display_framebuffer_scale = imgui.Vec2{f32(display_w / w), f32(display_h / h)};
     }
 }
 
