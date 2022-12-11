@@ -69,7 +69,6 @@ clean:
 
 cimgui_lib:
 	@echo "[Build CIMGUI]"
-	@echo "%ENVAR%"
 	$(TOOLS_DIR)\mkdir -p "$(EXTERNAL_LIB_DIR)"
 
 	$(CC) $(CIMGUI_FLAGS) /MTd /Zi /Fd:$(EXTERNAL_LIB_DIR)/cimgui_debug.pdb $(CIMGUI_SRC)
