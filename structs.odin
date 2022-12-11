@@ -1,4 +1,5 @@
 package imgui;
+import linalg "core:math/linalg"
 
 //ImColor 
 Color :: struct {
@@ -418,17 +419,10 @@ Viewport :: struct {
 	renderer_user_data, platform_user_data, platform_handle, platform_handle_raw : rawptr,
 }
 
-//ImVec2 
-Vec2 :: struct {
-	x: f32,
-	y: f32,
-}
+Vec2 :: linalg.Vector2f32
+Vec3 :: linalg.Vector3f32
+Vec4 :: linalg.Vector4f32
 
-//ImVec4 
-Vec4 :: struct {
-	x: f32,
-	y: f32,
-	z: f32,
-	w: f32,
-}
-
+Vec2i :: [2]int
+Vec3i :: [3]int
+Vec4i :: [4]int
