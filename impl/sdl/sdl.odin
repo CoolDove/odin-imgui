@@ -11,7 +11,6 @@ import imgui "../..";
 SDL_State :: struct {
     window : ^sdl.Window,
     time: u64,
-    mouse_down: [3]bool,
     cursor_handles: [imgui.Mouse_Cursor.Count]^sdl.Cursor,
 }
 
@@ -124,13 +123,6 @@ process_event :: proc(e: sdl.Event, state: ^SDL_State) {
             text := e.text;
             imgui.ImGuiIO_AddInputCharactersUTF8(io, cstring(&text.text[0]));
         }
-
-        case .MOUSEBUTTONDOWN: {
-            if e.button.button == u8(sdl.BUTTON_LEFT)   do state.mouse_down[0] = true;
-            if e.button.button == u8(sdl.BUTTON_RIGHT)  do state.mouse_down[1] = true;
-            if e.button.button == u8(sdl.BUTTON_MIDDLE) do state.mouse_down[2] = true;
-        }
-
         case .KEYDOWN, .KEYUP: {
             sc := e.key.keysym.scancode;
             io.keys_down[sc] = e.type == .KEYDOWN;
@@ -159,12 +151,11 @@ update_mouse :: proc(state: ^SDL_State, window: ^sdl.Window) {
     io := imgui.get_io();
     mx, my: i32;
     buttons := sdl.GetMouseState(&mx, &my);
-    io.mouse_down[0] = state.mouse_down[0] || (buttons & u32(sdl.BUTTON_LEFT))   != 0;
-    io.mouse_down[1] = state.mouse_down[1] || (buttons & u32(sdl.BUTTON_RIGHT))  != 0;
-    io.mouse_down[2] = state.mouse_down[2] || (buttons & u32(sdl.BUTTON_MIDDLE)) != 0;
-    state.mouse_down[0] = false;
-    state.mouse_down[1] = false;
-    state.mouse_down[2] = false;
+    io.mouse_down[0] = (buttons & u32(sdl.BUTTON_LMASK) != 0)
+    io.mouse_down[1] = (buttons & u32(sdl.BUTTON_RMASK) != 0)
+    io.mouse_down[2] = (buttons & u32(sdl.BUTTON_MMASK) != 0)
+    io.mouse_down[3] = (buttons & u32(sdl.BUTTON_X1MASK) != 0)
+    io.mouse_down[4] = (buttons & u32(sdl.BUTTON_X2MASK) != 0)
 
     // Set mouse pos if window is focused
     io.mouse_pos = imgui.Vec2{min(f32), min(f32)};
